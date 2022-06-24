@@ -47,7 +47,7 @@ async def investing(
             object_data_for_database['invested_amount']
         )
         free_amount_of_base_object = (
-                base_object.full_amount - base_object.invested_amount
+            base_object.full_amount - base_object.invested_amount
         )
         if free_amount_of_object_data > free_amount_of_base_object:
             base_object.invested_amount += free_amount_of_base_object
