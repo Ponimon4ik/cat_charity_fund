@@ -9,7 +9,7 @@ from app.crud.donation import donation_crude
 from app.models.donation import Donation
 from app.models.user import User
 from app.schemas.donation import DonationCreate, DonationDB, DonationUser
-from app.services.investion import investing
+from app.services.investing import investing
 
 router = APIRouter()
 

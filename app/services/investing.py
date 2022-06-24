@@ -30,25 +30,43 @@ async def investing(
         object_data_for_database['user_id'] = user.id
     if not database_objects:
         if model == Donation:
-            object = await donation_crude.create(object_data_for_database, session)
+            object = (
+                await donation_crude.create(object_data_for_database, session)
+            )
             return object
-        object = await charity_project_crud.create(object_data_for_database, session)
+        object = (
+            await charity_project_crud.create(
+                object_data_for_database, session
+            )
+        )
         return object
     object_data_for_database['invested_amount'] = 0
     for base_object in database_objects:
-        free_amount_of_object_data = object_for_database.full_amount - object_data_for_database['invested_amount']
-        free_amount_of_base_object = base_object.full_amount - base_object.invested_amount
+        free_amount_of_object_data = (
+            object_for_database.full_amount -
+            object_data_for_database['invested_amount']
+        )
+        free_amount_of_base_object = (
+                base_object.full_amount - base_object.invested_amount
+        )
         if free_amount_of_object_data > free_amount_of_base_object:
             base_object.invested_amount += free_amount_of_base_object
-            object_data_for_database['invested_amount'] += free_amount_of_base_object
+            object_data_for_database['invested_amount'] += (
+                free_amount_of_base_object
+            )
         else:
             base_object.invested_amount += free_amount_of_object_data
-            object_data_for_database['invested_amount'] += free_amount_of_object_data
+            object_data_for_database['invested_amount'] += (
+                free_amount_of_object_data
+            )
         if base_object.full_amount == base_object.invested_amount:
             base_object.fully_invested = True
             base_object.close_date = dt.now()
         session.add(base_object)
-        if object_data_for_database['invested_amount'] == object_for_database.full_amount:
+        if (
+                object_data_for_database['invested_amount'] ==
+                object_for_database.full_amount
+        ):
             object_data_for_database.update([
                 ('fully_invested', True),
                 ('close_date', dt.now())
