@@ -1,5 +1,6 @@
 from datetime import datetime as dt
-from sqlalchemy import Boolean, Column, String, Text, DATETIME, Integer
+
+from sqlalchemy import DATETIME, Boolean, Column, Integer
 
 
 class CharityBase:

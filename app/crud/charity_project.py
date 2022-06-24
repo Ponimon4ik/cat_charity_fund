@@ -1,6 +1,7 @@
 from typing import Optional
+
+from sqlalchemy import false, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, false
 
 from app.crud.base import CRUDBase
 from app.models.charity_project import CharityProject

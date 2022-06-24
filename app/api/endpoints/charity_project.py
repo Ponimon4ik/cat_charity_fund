@@ -3,13 +3,15 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.validators import check_name_duplicate, check_project, check_fully_invested_project
 from app.core.db import get_async_session
-from app.models.charity_project import CharityProject
 from app.core.user import current_superuser
-from app.schemas.charity_project import CharityProjectDB, CharityProjectUpdate, CharityProjectCreate
 from app.crud.charity_project import charity_project_crud
-from app.api.validators import check_name_duplicate, check_project
-from app.services.investion import investion
+from app.models.charity_project import CharityProject
+from app.schemas.charity_project import (
+    CharityProjectCreate, CharityProjectDB, CharityProjectUpdate
+)
+from app.services.investion import investing
 
 router = APIRouter()
 
@@ -18,7 +20,6 @@ router = APIRouter()
     '/',
     response_model=List[CharityProjectDB],
     response_model_exclude_none=True,
-    # dependencies=[Depends(current_superuser)]
 )
 async def get_all_projects(
         session: AsyncSession = Depends(get_async_session)
@@ -32,8 +33,6 @@ async def get_all_projects(
     response_model=CharityProjectDB,
     response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],
-
-
 )
 async def create_project(
         project: CharityProjectCreate,
@@ -41,7 +40,7 @@ async def create_project(
 ) -> CharityProject:
     """Только для суперюзеров."""
     await check_name_duplicate(project.name, session)
-    new_project = await investion(
+    new_project = await investing(
         object_for_database=project,
         session=session,
         project=True
@@ -61,11 +60,7 @@ async def update_project(
 ) -> CharityProject:
     """Только для суперюзеров."""
     project = await check_project(project_id, session)
-    if project.fully_invested:
-        raise HTTPException(
-            status_code=400,
-            detail='Закрытый проект нельзя редактировать!'
-        )
+    check_fully_invested_project(project)
     if obj_in.name:
         if obj_in.name != project.name:
             await check_name_duplicate(obj_in.name, session)

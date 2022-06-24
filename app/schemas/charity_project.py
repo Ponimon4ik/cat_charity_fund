@@ -1,6 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel, Extra, PositiveInt, Field, validator, root_validator
+from pydantic import (
+    BaseModel, Extra, Field, PositiveInt, root_validator
+)
 
 from app.schemas.base import CharityBase
 

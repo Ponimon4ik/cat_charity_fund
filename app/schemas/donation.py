@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from typing import Optional
-from pydantic import BaseModel, PositiveInt, Extra
+
+from pydantic import BaseModel, Extra, PositiveInt
 
 from app.schemas.base import CharityBase
 
