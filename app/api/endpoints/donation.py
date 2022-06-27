@@ -49,9 +49,6 @@ async def create_donation(
         session: AsyncSession = Depends(get_async_session),
         user: User = Depends(current_user)
 ) -> Donation:
-    donation = await investing(
-        object_for_database=donation,
-        session=session,
-        user=user
-    )
+    donation_data = await investing(donation, session,)
+    donation = await donation_crude.create(donation_data, session, user)
     return donation

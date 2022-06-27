@@ -3,8 +3,6 @@ from typing import Optional
 
 from pydantic import BaseModel, Extra, PositiveInt
 
-from app.schemas.base import CharityBase
-
 
 class DonationBase(BaseModel):
     full_amount: PositiveInt
@@ -18,7 +16,7 @@ class DonationCreate(DonationBase):
     pass
 
 
-class DonationUser(DonationCreate):
+class DonationUser(DonationBase):
 
     id: int
     create_date: dt
@@ -27,9 +25,9 @@ class DonationUser(DonationCreate):
         orm_mode = True
 
 
-class DonationDB(DonationCreate, CharityBase):
+class DonationDB(DonationUser):
 
     user_id: int
-
-    class Config:
-        orm_mode = True
+    invested_amount: int
+    fully_invested: bool
+    close_date: Optional[dt]

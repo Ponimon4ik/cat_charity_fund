@@ -1,6 +1,10 @@
+from typing import Optional
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import false, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import User
 
 
 class CRUDBase:
@@ -31,10 +35,14 @@ class CRUDBase:
 
     async def create(
             self,
-            obj_in_data,
+            obj_in,
             session: AsyncSession,
+            user: Optional[User] = None
     ):
-        db_obj = self.model(**obj_in_data)
+        obj_data = obj_in.dict() if type(obj_in) is not dict else obj_in
+        if user:
+            obj_data['user_id'] = user.id
+        db_obj = self.model(**obj_data)
         session.add(db_obj)
         await session.commit()
         await session.refresh(db_obj)

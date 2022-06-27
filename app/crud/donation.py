@@ -4,8 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
-from app.models.donation import Donation
-from app.models.user import User
+from app.models import Donation, User
 
 
 class CRUDDonation(CRUDBase):
@@ -20,8 +19,7 @@ class CRUDDonation(CRUDBase):
                 Donation.user_id == user.id
             )
         )
-        donations = donations.scalars().all()
-        return donations
+        return donations.scalars().all()
 
 
 donation_crude = CRUDDonation(Donation)

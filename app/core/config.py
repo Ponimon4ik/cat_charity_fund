@@ -3,11 +3,10 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     app_title: str = 'Благотворительный фонд поддержки котиков QRKot'
-    description: str = (
-        'Фонд собирает пожертвования на '
-        'различные целевые проекты'
+    app_description: str = (
+        'Фонд собирает пожертвования на различные целевые проекты'
     )
-    database_url: str = 'sqlite+aiosqlite:///./fastapi.db.db'
+    database_url: str = 'sqlite+aiosqlite:///./cat_charity_fund.db'
     secret: str = 'SECRET'
 
     class Config:

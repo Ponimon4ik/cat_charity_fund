@@ -1,11 +1,9 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import (
-    check_name_duplicate, check_project, check_fully_invested_project
-)
+from app.api.validators import validate_project, check_name_duplicate
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
@@ -42,11 +40,11 @@ async def create_project(
 ) -> CharityProject:
     """Только для суперюзеров."""
     await check_name_duplicate(project.name, session)
-    new_project = await investing(
+    new_project_data = await investing(
         object_for_database=project,
         session=session,
-        project=True
     )
+    new_project = await charity_project_crud.create(new_project_data, session)
     return new_project
 
 
@@ -61,11 +59,13 @@ async def update_project(
         session: AsyncSession = Depends(get_async_session)
 ) -> CharityProject:
     """Только для суперюзеров."""
-    project = await check_project(project_id, session)
-    check_fully_invested_project(project)
+    project = await validate_project.check_project(project_id, session)
+    validate_project.check_fully_invested_project(project)
     if obj_in.name:
         if obj_in.name != project.name:
             await check_name_duplicate(obj_in.name, session)
+    if obj_in.full_amount:
+        validate_project.check_project_new_full_amount(project, obj_in)
     project = await charity_project_crud.update(project, obj_in, session)
     return project
 
@@ -80,13 +80,8 @@ async def delete_project(
         session: AsyncSession = Depends(get_async_session)
 ) -> CharityProject:
     """Только для суперюзеров."""
-    project = await check_project(project_id, session)
-    if project.invested_amount > 0:
-        raise HTTPException(
-            status_code=400,
-            detail='В проект были внесены средства, '
-                   'не подлежит удалению!'
-        )
+    project = await validate_project.check_project(project_id, session)
+    validate_project.check_invested_project(project)
     project = await charity_project_crud.remove(
         project, session
     )
