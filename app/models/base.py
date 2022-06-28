@@ -13,3 +13,10 @@ class CharityBase(Base):
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DATETIME, default=dt.now)
     close_date = Column(DATETIME)
+
+    def __repr__(self):
+        return (
+            f'full_amount: {self.full_amount}, '
+            f'invested_amount: {self.invested_amount}, '
+            f'create_date: {self.create_date}'
+        )

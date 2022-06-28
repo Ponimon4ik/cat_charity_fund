@@ -9,4 +9,8 @@ class Donation(CharityBase):
     comment = Column(Text, nullable=True)
 
     def __repr__(self):
-        return f'{self.user_id} {self.comment} {self.full_amount}'
+        return (
+            f'user_id: {self.user_id}, '
+            f'comment: {self.comment}, '
+            f'full_amount: {self.full_amount}'
+        )

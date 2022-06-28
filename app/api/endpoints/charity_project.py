@@ -40,11 +40,10 @@ async def create_project(
 ) -> CharityProject:
     """Только для суперюзеров."""
     await check_name_duplicate(project.name, session)
-    new_project_data = await investing(
-        object_for_database=project,
-        session=session,
-    )
-    new_project = await charity_project_crud.create(new_project_data, session)
+    new_project = await charity_project_crud.create(project, session)
+    await investing(new_project, session)
+    await session.commit()
+    await session.refresh(new_project)
     return new_project
 
 

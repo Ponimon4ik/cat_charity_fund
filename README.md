@@ -52,6 +52,8 @@ Cоздать env-файл и прописать переменные окруж
 ```
 DATABASE_URI= dialect+driver://username:password@host:port/database # расположение базы данных
 SECRET_KEY= secret_key # секретный ключ приложения
+FIRST_SUPERUSER_EMAIL=admin@mail.ru # почтовый адресс первого суперюзера
+FIRST_SUPERUSER_PASSWORD=admin # пароль для уч. записи первого суперюзера
 ```
 Для создания БД, выполните следующие команду:
 ```
@@ -63,6 +65,8 @@ SECRET_KEY= secret_key # секретный ключ приложения
 ```
 >>> uvicorn app.main:app --reload 
 ```
+При первом запуске приложения суперюзер создается автоматически
+на основании данных для первого суперюзера из .env
 
 ### Автор:
 

@@ -9,4 +9,8 @@ class CharityProject(CharityBase):
     description = Column(Text, nullable=False)
 
     def __repr__(self):
-        return f'{self.name} {self.description} {self.full_amount}'
+        return (
+            f'name: {self.name[10]}, '
+            f'description: {self.description[10]}, '
+            f'full_amount: {self.full_amount}'
+        )
