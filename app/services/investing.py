@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from typing import Union, Dict
+from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
