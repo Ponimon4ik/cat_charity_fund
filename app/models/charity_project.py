@@ -10,7 +10,6 @@ class CharityProject(CharityBase):
 
     def __repr__(self):
         return (
-            f'name: {self.name[10]}, '
-            f'description: {self.description[10]}, '
-            f'full_amount: {self.full_amount}'
-        )
+            f'name: {self.name[:10]}, '
+            f'description: {self.description[:10]}, '
+        ) + super().__repr__()

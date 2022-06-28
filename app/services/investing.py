@@ -3,8 +3,7 @@ from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.charity_project import charity_project_crud
-from app.crud.donation import donation_crude
+from app.crud.base import CRUDBase
 from app.models import Donation, CharityProject
 
 
@@ -12,31 +11,22 @@ async def investing(
     source: Union[CharityProject, Donation],
     session: AsyncSession,
 ) -> Union[CharityProject, Donation]:
-    database_objects = (
-        await donation_crude.get_not_fully_invested(session)
-        if source.__class__ is CharityProject
-        else await charity_project_crud.get_not_fully_invested(session)
-    )
     source.invested_amount = 0
-    for target in database_objects:
-        remains_of_source = (
-            source.full_amount - source.invested_amount
+    for target in await CRUDBase(
+            Donation if source.__class__ is CharityProject else CharityProject
+    ).get_not_fully_invested(session):
+        allocated_amount = (
+            (target.full_amount - target.invested_amount) if
+            (source.full_amount - source.invested_amount) >
+            (target.full_amount - target.invested_amount) else
+            (source.full_amount - source.invested_amount)
         )
-        remains_of_target = (
-            target.full_amount - target.invested_amount
-        )
-        if remains_of_source > remains_of_target:
-            target.invested_amount += remains_of_target
-            source.invested_amount += remains_of_target
-        else:
-            target.invested_amount += remains_of_source
-            source.invested_amount += remains_of_source
-        if target.full_amount == target.invested_amount:
-            target.fully_invested = True
-            target.close_date = dt.now()
+        target.invested_amount += allocated_amount
+        source.invested_amount += allocated_amount
         session.add(target)
-        if source.full_amount == source.invested_amount:
-            source.fully_invested = True
-            source.close_date = dt.now()
-            break
+        for object in (target, source):
+            if object.full_amount == object.invested_amount:
+                object.fully_invested, object.close_date = True, dt.now()
+                if object is source:
+                    break
     return source

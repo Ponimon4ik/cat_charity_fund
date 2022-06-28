@@ -11,6 +11,5 @@ class Donation(CharityBase):
     def __repr__(self):
         return (
             f'user_id: {self.user_id}, '
-            f'comment: {self.comment}, '
-            f'full_amount: {self.full_amount}'
-        )
+            f'comment: {self.comment[:10]}, '
+        ) + super().__repr__()
