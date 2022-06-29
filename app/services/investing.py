@@ -3,7 +3,8 @@ from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.base import CRUDBase
+from app.crud.charity_project import charity_project_crud
+from app.crud.donation import donation_crude
 from app.models import Donation, CharityProject
 
 
@@ -11,10 +12,10 @@ async def investing(
     source: Union[CharityProject, Donation],
     session: AsyncSession,
 ) -> Union[CharityProject, Donation]:
-    if not source.invested_amount:
+    if source.invested_amount is None:
         source.invested_amount = 0
-    crud = CRUDBase(Donation) if isinstance(
-        source, CharityProject) else CRUDBase(CharityProject)
+    crud = donation_crude if isinstance(
+        source, CharityProject) else charity_project_crud
     for target in await crud.get_not_fully_invested(session):
         session.add(target)
         allocated_amount = (
