@@ -11,22 +11,22 @@ async def investing(
     source: Union[CharityProject, Donation],
     session: AsyncSession,
 ) -> Union[CharityProject, Donation]:
-    source.invested_amount = 0
-    for target in await CRUDBase(
-            Donation if source.__class__ is CharityProject else CharityProject
-    ).get_not_fully_invested(session):
+    if not source.invested_amount:
+        source.invested_amount = 0
+    crud = CRUDBase(Donation) if isinstance(
+        source, CharityProject) else CRUDBase(CharityProject)
+    for target in await crud.get_not_fully_invested(session):
+        session.add(target)
         allocated_amount = (
-            (target.full_amount - target.invested_amount) if
-            (source.full_amount - source.invested_amount) >
-            (target.full_amount - target.invested_amount) else
+            (target.full_amount - target.invested_amount)
+            if (source.full_amount - source.invested_amount) >
+               (target.full_amount - target.invested_amount) else
             (source.full_amount - source.invested_amount)
         )
-        target.invested_amount += allocated_amount
-        source.invested_amount += allocated_amount
-        session.add(target)
         for object in (target, source):
-            if object.full_amount == object.invested_amount:
+            object.invested_amount += allocated_amount
+            if object.invested_amount == object.full_amount:
                 object.fully_invested, object.close_date = True, dt.now()
-                if object is source:
-                    break
+        if source.fully_invested:
+            break
     return source
